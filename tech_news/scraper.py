@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from requests.exceptions import ReadTimeout
 import time
+import re
 
 
 # Requisito 1
@@ -63,7 +64,36 @@ def scrape_next_page_link(html_content):
 
 # Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    soup.prettify()
+
+    news = {}
+
+    news["url"] = soup.find(
+        "div", {"class": "pk-share-buttons-wrap"}
+    )["data-share-url"]
+
+    news["title"] = soup.find(
+        "h1", {"class": "entry-title"}
+    ).string.replace("\xa0", " ").strip()
+
+    news["timestamp"] = soup.find("li", {"class": "meta-date"}).string
+
+    news["writer"] = soup.find(
+        "span", {"class": "author"}
+    ).string
+
+    news["reading_time"] = int(re.sub('[^0-9]', '', soup.find(
+        "li", {"class": "meta-reading-time"}
+    ).text))
+
+    news["summary"] = soup.find(
+        "div", {"class": "entry-content"}
+    ).p.text.replace("\xa0", " ").strip()
+
+    news["category"] = soup.find("span", {"class": "label"}).text
+
+    return news
 
 
 # Requisito 5
