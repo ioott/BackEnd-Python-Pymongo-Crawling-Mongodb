@@ -13,7 +13,7 @@ def fetch(url):
             headers={"user-agent": "Fake user-agent"},
             timeout=3
         )
-        html_page = response.text
+        html_content = response.text
 
         if response.status_code != 200:
             return None
@@ -21,14 +21,26 @@ def fetch(url):
     except (ReadTimeout):
         return None
 
-    soup = BeautifulSoup(html_page, "html.parser")
+    soup = BeautifulSoup(html_content, "html.parser")
     soup.prettify()
-    return html_page
+    return html_content
 
 
 # Requisito 2
 def scrape_updates(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    soup.prettify()
+
+    url_list = []
+
+    for post in soup.find_all(
+        "article", {"class": "entry-preview"}
+    ):
+        url_list.append(post.find(
+            "div",
+            {"class": "cs-overlay"},
+        ).a["href"])
+    return url_list
 
 
 # Requisito 3
