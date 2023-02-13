@@ -99,19 +99,21 @@ def scrape_news(html_content):
 def get_tech_news(amount):
     scraped_news = []
     url = "https://blog.betrybe.com"
+    url_news_list = []
 
-    while len(scraped_news) <= amount:
+    while len(url_news_list) <= amount:
         html_content = fetch(url)
 
-        url_news_list = scrape_updates(html_content)
-
-        for each_url in url_news_list:
-            each_html_content = fetch(each_url)
-            data_news = scrape_news(each_html_content)
-            scraped_news.append(data_news)
+        url_news_list.extend(scrape_updates(html_content))
 
         if scrape_next_page_link(html_content) is not None:
             url = scrape_next_page_link(html_content)
+
+    for each_url in url_news_list[:amount]:
+        each_html_content = fetch(each_url)
+        data_news = scrape_news(each_html_content)
+
+        scraped_news.append(data_news)
 
     create_news(scraped_news)
     return scraped_news
