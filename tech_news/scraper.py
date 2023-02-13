@@ -3,6 +3,7 @@ import requests
 from requests.exceptions import ReadTimeout
 import time
 import re
+from .database import create_news
 
 
 # Requisito 1
@@ -22,8 +23,6 @@ def fetch(url):
     except (ReadTimeout):
         return None
 
-    soup = BeautifulSoup(html_content, "html.parser")
-    soup.prettify()
     return html_content
 
 
@@ -98,4 +97,21 @@ def scrape_news(html_content):
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    scraped_news = []
+    url = "https://blog.betrybe.com"
+
+    while len(scraped_news) <= amount:
+        html_content = fetch(url)
+
+        url_news_list = scrape_updates(html_content)
+
+        for each_url in url_news_list:
+            each_html_content = fetch(each_url)
+            data_news = scrape_news(each_html_content)
+            scraped_news.append(data_news)
+
+        if scrape_next_page_link(html_content) is not None:
+            url = scrape_next_page_link(html_content)
+
+    create_news(scraped_news)
+    return scraped_news
