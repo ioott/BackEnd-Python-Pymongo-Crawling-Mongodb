@@ -21,7 +21,6 @@ def search_by_date(date):
     try:
         str_to_date = datetime.datetime.strptime(date, "%Y-%m-%d")
         formated_date = str_to_date.strftime("%d/%m/%Y")
-        # date_to_str = str(formated_date)
         query = ({"timestamp": formated_date})
 
         results = search_news(query)
@@ -37,4 +36,12 @@ def search_by_date(date):
 
 # Requisito 9
 def search_by_category(category):
-    """Seu código deve vir aqui"""
+    regex = re.compile(category, re.IGNORECASE)
+    query = ({"category": {"$regex": regex}})
+    results = search_news(query)
+
+    return [(
+        result["title"],
+        result["url"])
+        for result in results
+    ]
